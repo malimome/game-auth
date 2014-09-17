@@ -9,6 +9,7 @@ __pycache__/
 .Python
 results/
 profiles/
+login/
 env/
 build/
 develop-eggs/
@@ -23,6 +24,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+#VIM stuff
+*.swp
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

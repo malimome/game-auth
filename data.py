@@ -46,10 +46,15 @@ getlevel = lambda x: x[9]
 dtmaxlen = [[120], [120], [120],[120],[120],[120],[120],[120]]
 #dtmaxlen = [[0], [0], [0],[0],[0],[0],[0],[0],[0]]
 DEBUGL = 1 #0, 1, 2
-dtpath = "results/"
+dtpathp = "profiles/"
+dtpathl = "login/"
 
-def getUsers():
-  global dtpath
+def getUsers(is_profile = True):
+  global dtpathp, dtpathl
+  if is_profile:
+    dtpath = dtpathp
+  else:
+    dtpath = dtpathl
   blacklist = []#"FK__123.csv", "MMS__1362.csv", "AmirT__123.csv", "AH__1234.csv"]#, "User1__123.csv"]
   if not isdir(dtpath):
     dtpath = "./"
@@ -71,9 +76,13 @@ def getUsers():
 
 class UserData:
 #data for one user
-  def __init__(self, user):
-    global dtpath
-    self.dtpath = dtpath
+  def __init__(self, user, is_profile = True):
+    global dtpathp
+    global dtpathl
+    if is_profile:
+      self.dtpath = dtpathp
+    else:
+      self.dtpath = dtpathl
     self.rawdata = [] #all data for one user all rows
     self.rawcount = 0
     self.rawdtlevels = {} #data for user per level

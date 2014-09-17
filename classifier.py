@@ -6,7 +6,7 @@ class ClassificationBase(object):
     self.start = start
     self.length = length
     self.userlvl = dict()
-    self.ud,self.mincLF = self.getUsersData()  #ud is the user data per level feature
+    self.ud,self.mincLF = self.readProfiles()  #ud is the user data per level feature
     self.ulf = dict() #the training data
     self.ulftest = dict()   # the test data
     self.level = -1
@@ -88,7 +88,7 @@ class ClassificationBase(object):
       a4 = data[end:start]
     return a3,a4
 
-  def getUsersData(self):
+  def readProfiles(self):
     """ Get data for all users + the min in each level for all users """
     users = mldata.getUsers()
     ud = {}
@@ -163,7 +163,8 @@ class ClassificationFusion(ClassificationMultiD):
 
     finalscores = {}
     #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-    weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
+    weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
     for user in self.userlvl[self.level]:
       finalscores[user] = 0
       for ft in mldata.enfeatures:

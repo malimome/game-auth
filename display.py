@@ -45,10 +45,11 @@ def display_vrf(result, ud_ftlevel, level):
   usermap = ""
   rs = ""
   resultstr = ""
+  pdb.set_trace()
   for refuser in allusers:
     d = result[refuser]
     ds = sorted(d.itervalues())
-    zeta = ds[1]
+    zeta = ds[2]
     userind = str(allusers.index(refuser))
     um = string.ljust(userind, 4) + "-> " + string.ljust(refuser[:20], 22) + " | "
     rs = string.ljust(userind, 3) + " -> "

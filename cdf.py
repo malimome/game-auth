@@ -44,7 +44,7 @@ class ClassificationCDF(ClassificationOneD):
     if not data or not test:
       raise ErrEmptyData
     d,pval = ks_2samp(data, test)
-    return d 
+    return d
 
 """ Fusion class """    
 class ClassificationCDF_Fusion(ClassificationFusion, ClassificationCDF):
