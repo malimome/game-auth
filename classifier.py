@@ -10,6 +10,9 @@ class ClassificationBase(object):
     self.ulf = dict() #the training data
     self.ulftest = dict()   # the test data
     self.level = -1
+    #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    self.weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
 
   def checkGenSplitData(self, level, feature = -1):
     ud = self.ud
@@ -146,6 +149,12 @@ class ClassificationMultiD(ClassificationBase):
       refscores[ref] = self.classifyByLevelMultiRef(ref)
     return refscores  
 
+  def classifyByLevelUser(self, level, user):
+    if not self.checkGenSplitData(level):
+      return {}
+    scores = self.classifyByLevelFeature(level)
+    return scores
+ 
   def classifyByLevel(self, level):
     if not self.checkGenSplitData(level):
       return {}
@@ -162,12 +171,9 @@ class ClassificationFusion(ClassificationMultiD):
       scores[ft] = self.classifyByLevelFeatureRef(self.level, ft, ref)
 
     finalscores = {}
-    #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-    weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
-    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
     for user in self.userlvl[self.level]:
       finalscores[user] = 0
       for ft in mldata.enfeatures:
-        finalscores[user] += scores[ft][user] * weights[ft]
+        finalscores[user] += scores[ft][user] * self.weights[ft]
     return finalscores
 

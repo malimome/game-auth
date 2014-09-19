@@ -52,9 +52,13 @@ if method in names:
   refscores = cls.classifyByLevel(level)
 elif method == "cdf_fusion":
   ccdf = cdf.ClassificationCDF_Fusion(start, length)
-  refscores = ccdf.classifyByLevel(level)
-  #display_result(refscores)
-  display_vrf(refscores, ccdf.ud, level)
+  if user != '':
+    refscores = ccdf.classifyByLevelUser(level, user)
+    print refscores
+  else:
+    refscores = ccdf.classifyByLevel(level)
+    #display_result(refscores)
+    display_vrf(refscores, ccdf.ud, level)
 elif method == "pdf_fusion":
   ccdf = pdf.ClassificationPDF_Fusion(start, length)
   refscores = ccdf.classifyByLevel(level)
