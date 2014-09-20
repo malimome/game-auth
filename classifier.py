@@ -6,90 +6,13 @@ class ClassificationBase(object):
     self.start = start
     self.length = length
     self.userlvl = dict()
-    self.ud,self.mincLF = self.readProfiles()  #ud is the user data per level feature
-    self.ulf = dict() #the training data
-    self.ulftest = dict()   # the test data
+    #self.ud,self.mincLF = self.readProfiles()  #ud is the user data per level feature
+    self.profiles = {}
+    self.attempt = {}
+    self.mindtPr = {}
+    #self.ulf = dict() #the training data
+    #self.ulftest = dict()   # the test data
     self.level = -1
-    #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-    self.weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
-    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
-
-  def checkGenSplitData(self, level, feature = -1):
-    ud = self.ud
-    if level != self.level:
-      self.ulf, self.ulftest = self.getSplitData(level)
-      self.level = level
-      return True
-    if not self.ulf or not self.ulftest:
-      self.ulf, self.ulftest = self.getSplitData(level)
-    for user in self.userlvl[level]:
-      if user not in self.ulf or user not in self.ulftest:
-        print ("Prob in data for user %s"%user)
-        return False
-      if feature != -1:
-        if not self.ulf[user][feature] or not self.ulftest[user][feature]:
-          print("Prob for level %d data, feature %d user %s"%(level, feature, user))
-          return False
-      else:
-        for feature in mldata.enfeatures:
-          if not self.ulf[user][feature] or not self.ulftest[user][feature]:
-            print("Prob for level %d data, feature %d user %s"%(level, feature, user))
-            return False
-    return True
-
-  def classifyByFeature(self, feature):
-    levelscores = {}
-    for level in self.ud.ftlevels:
-      levelscores[level] = self.classifyByLevelFeature(level, feature)
-
-  def classifyUsers(self):
-    allscores = {}
-    for level in mldata.levelenum:
-      allscores[level] = self.classifyByLevel(level)
-    return allscores
-
-  def getSplitData(self, level):
-    ud = self.ud
-    ulf = dict()
-    ulftest = dict()
-    maxlevel = self.mincLF[level]
-    if mldata.dtmaxlen[level] != 0 and mldata.dtmaxlen[level] < maxlevel:
-      maxlevel = mldata.dtmaxlen[level]
-    if mldata.DEBUGL >= 1:
-      print("Number of rows of data \t\t %d"%maxlevel)
-      print("Level of the game \t\t %d"%level)
-    for user in self.userlvl[level]:
-      ulf[user] = {}
-      ulftest[user] = {}
-      for feature in mldata.enfeatures:
-        data = ud[user][level][feature]
-        data = data[-maxlevel:] # TODO change the slice to pick
-        #data = data[:maxlevel]
-        test,dt = self.splitTestTraining(data, self.start, self.length)
-        ulf[user][feature] = dt
-        ulftest[user][feature] = test
-    return ulf, ulftest
-
-  def splitTestTraining(self, data, start, length):
-    dtlen = len(data)
-    if abs(length)*3 > dtlen:
-      return [],[]
-    end = (start + length) % (dtlen)
-    a3 = list()
-    a4 = list()
-    if end==0:
-      a3 = data[start:]
-      a4 = data[:start]
-    elif start == 0 and length<0:
-      a3 = data[end:]
-      a4 = data[:end]
-    elif end > start: 
-      a3 = data[start:end]
-      a4 = data[:start]+data[end:]
-    else:
-      a3 = data[:end]+data[start:]
-      a4 = data[end:start]
-    return a3,a4
 
   def readProfiles(self):
     """ Get data for all users + the min in each level for all users """
@@ -117,21 +40,50 @@ class ClassificationBase(object):
       mincountperL[level] = minc
     return ud, mincountperL
 
+  def readAttempt(self, level, user):
+    users = mldata.getUsers(is_profile = False)
+    if user not in users:
+      return False, False
+    dtuser = mldata.UserData(user, is_profile = False)
+    udcount = dtuser.getUserFeatureLevels()
+    return dtuser.ftlevels,udcount
+
+  def readPAdata(self, level, user=''):
+    if not self.profiles:
+      self.profiles,self.mindtPr = self.readProfiles()
+    #if self.profiles
+    if user=='':
+      return True
+    self.attempt, tmp = self.readAttempt(level, user)
+    #if self.attempt == False:
+    #  return False
+
+  def classifyByFeature(self, feature):
+    levelscores = {}
+    for level in self.profiles.ftlevels:
+      levelscores[level] = self.classifyByLevelFeature(level, feature)
+
+  def classifyUsers(self):
+    allscores = {}
+    for level in mldata.levelenum:
+      allscores[level] = self.classifyByLevel(level)
+    return allscores
+
 class ClassificationOneD(ClassificationBase):
   def __init__(self, start, length):
     super(ClassificationOneD, self).__init__(start, length)
 
   def classifyByLevelFeature(self, level, feature):
-    if not self.checkGenSplitData(level, feature):
+    if not self.readPAdata(level, feature):
       return {}
     refscores = {}
     for ref in self.userlvl[level]:
-      refscores[ref] = self.classifyByLevelFeatureRef(level, feature, ref)
+      refscores[ref] = self.classifyByLevelFeatureRef(level, feature)
     return refscores
    
   def classifyByLevel(self, level):
     featurecores = {}
-    if not self.checkGenSplitData(level):
+    if not self.readPAdata(level):
       return {}
     for ft in mldata.enfeatures:
       featurecores[ft] = self.classifyByLevelFeature(level, ft)
@@ -141,34 +93,43 @@ class ClassificationMultiD(ClassificationBase):
   def __init__(self, start, length):
     super(ClassificationMultiD, self).__init__(start, length)
  
-  def classifyByLevelFeature(self, level, feature = -1):
-    if not self.checkGenSplitData(level):
+  def classifyByLevelFeature(self, level, user = ''):
+    if not self.readPAdata(level):
       return {}
     refscores = {}
+    if user != '':
+      return self.classifyByLevelMultiRef(user)
+
     for ref in self.userlvl[level]:
       refscores[ref] = self.classifyByLevelMultiRef(ref)
     return refscores  
 
   def classifyByLevelUser(self, level, user):
-    if not self.checkGenSplitData(level):
-      return {}
-    scores = self.classifyByLevelFeature(level)
+    pdb.set_trace()
+    self.readPAdata(level, user)
+    self.level = level
+    #  return {}
+    scores = self.classifyByLevelFeature(level, user)
     return scores
  
   def classifyByLevel(self, level):
-    if not self.checkGenSplitData(level):
+    if not self.readPAdata(level):
       return {}
+    self.level = level
     scores = self.classifyByLevelFeature(level)
     return scores
    
 class ClassificationFusion(ClassificationMultiD):
   def __init__(self, start, length):
     super(ClassificationFusion, self).__init__(start, length)
+    #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    self.weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
 
   def classifyByLevelMultiRef(self, ref):
     scores = {}
     for ft in mldata.enfeatures:
-      scores[ft] = self.classifyByLevelFeatureRef(self.level, ft, ref)
+      scores[ft] = self.classifyByLevelFeatureRef(self.level, ft)
 
     finalscores = {}
     for user in self.userlvl[self.level]:

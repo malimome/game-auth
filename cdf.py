@@ -31,12 +31,12 @@ class ClassificationCDF(ClassificationOneD):
   def __init__(self, start, length):
     super(ClassificationCDF, self).__init__(start, length)
 
-  def classifyByLevelFeatureRef(self, level, feature, refuser):
-    ud = self.ud
-    test = self.ulftest[refuser][feature]
+  def classifyByLevelFeatureRef(self, level, feature):
+    #pdb.set_trace()
+    test = self.attempt[level][feature]
     scores = dict()
     for user in self.userlvl[level]:
-      data = self.ulf[user][feature]
+      data = self.profiles[user][level][feature]
       scores[user] = self.classifySimilarity(data, test, feature)
     return scores
 
