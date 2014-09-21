@@ -141,6 +141,7 @@ class UserData:
       for ft in enfeatures:
         self.ftlevels[level][ft] = []
 
+    #TODO remove levels 
     for level in self.rawdtlevels:
       for ft in enfeatures:
         for row in self.rawdtlevels[level]:

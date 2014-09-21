@@ -5,13 +5,10 @@ class ClassificationBase(object):
   def __init__(self, start, length):
     self.start = start
     self.length = length
-    self.userlvl = dict()
-    #self.ud,self.mincLF = self.readProfiles()  #ud is the user data per level feature
     self.profiles = {}
     self.attempt = {}
+    self.userlvl = []
     self.mindtPr = {}
-    #self.ulf = dict() #the training data
-    #self.ulftest = dict()   # the test data
     self.level = -1
 
   def readProfiles(self):
@@ -25,19 +22,18 @@ class ClassificationBase(object):
       udcount[user] = dtuser.getUserFeatureLevels()
       ud[user] = dtuser.ftlevels #data from all levels and features for one user
 
-    for level in mldata.levelenum:
-      minc = 1000000
-      self.userlvl[level] = []
-      for user in users:
-        if mldata.DEBUGL >= 2:
-          print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user][level]))
-        cntuserlvl = udcount[user][level]
-        if cntuserlvl <= 120:
-          continue
-        self.userlvl[level].append(user)
-        if udcount[user][level] < minc:
-          minc = udcount[user][level]
-      mincountperL[level] = minc
+    minc = 1000000
+    self.userlvl = []
+    for user in users:
+      if mldata.DEBUGL >= 2:
+        print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user][level]))
+      cntuserlvl = udcount[user][self.level]
+      if cntuserlvl <= 120:
+        continue
+      self.userlvl.append(user)
+      if udcount[user][self.level] < minc:
+        minc = udcount[user][self.level]
+    mincountperL = minc
     return ud, mincountperL
 
   def readAttempt(self, level, user):
@@ -49,6 +45,7 @@ class ClassificationBase(object):
     return dtuser.ftlevels,udcount
 
   def readPAdata(self, level, user=''):
+    self.level = level
     if not self.profiles:
       self.profiles,self.mindtPr = self.readProfiles()
     #if self.profiles
@@ -77,7 +74,7 @@ class ClassificationOneD(ClassificationBase):
     if not self.readPAdata(level, feature):
       return {}
     refscores = {}
-    for ref in self.userlvl[level]:
+    for ref in self.userlvl:
       refscores[ref] = self.classifyByLevelFeatureRef(level, feature)
     return refscores
    
@@ -100,7 +97,7 @@ class ClassificationMultiD(ClassificationBase):
     if user != '':
       return self.classifyByLevelMultiRef(user)
 
-    for ref in self.userlvl[level]:
+    for ref in self.userlvl:
       refscores[ref] = self.classifyByLevelMultiRef(ref)
     return refscores  
 
@@ -131,8 +128,9 @@ class ClassificationFusion(ClassificationMultiD):
     for ft in mldata.enfeatures:
       scores[ft] = self.classifyByLevelFeatureRef(self.level, ft)
 
+    pdb.set_trace()
     finalscores = {}
-    for user in self.userlvl[self.level]:
+    for user in self.userlvl:
       finalscores[user] = 0
       for ft in mldata.enfeatures:
         finalscores[user] += scores[ft][user] * self.weights[ft]
