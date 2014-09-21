@@ -143,11 +143,11 @@ class ClassificationML_Multi(ClassificationMultiD):
     y = []
     corresp = {}
     ind = 0
-    for user in self.userlvl[self.level]:
+    for user in self.userlvl:
       corresp[user] = ind
       for ft in mldata.enfeatures:
-        userlen = len(self.ulf[user][ft])
-        userlentest = len(self.ulftest[user][ft])
+        userlen = len(self.profiles[user][ft])
+        userlentest = len(self.attempt[ft])
         break
       for i in range(userlen):
         iuserft = []
@@ -182,7 +182,7 @@ class ClassificationML_Multi(ClassificationMultiD):
     return []
 
   def classifyByLevelFeature(self, level, feature = -1):
-    if not self.checkGenSplitData(level):
+    if not self.readPAdata(level, feature):
       return {}
     refscores = self.classifyByLevelMultiRef()
     return refscores  

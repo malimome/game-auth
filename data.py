@@ -39,12 +39,9 @@ def set_enfeatures(fts):
   enfeatures = fts
 LevelsNoSuffData = [] #[2,3,5,8]
 levelenum = [x for x in range(0,9) if x not in LevelsNoSuffData]
-#level = '0'
 filterow  = lambda x: (int(x[17].strip()) == 0) # and abs(float(x[7])-float(x[5])) <= 2000)
-#condition = lambda x: (x[9].strip() == level)
 getlevel = lambda x: x[9]
 dtmaxlen = [[120], [120], [120],[120],[120],[120],[120],[120]]
-#dtmaxlen = [[0], [0], [0],[0],[0],[0],[0],[0],[0]]
 DEBUGL = 1 #0, 1, 2
 dtpathp = "profiles/"
 dtpathl = "login/"

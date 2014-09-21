@@ -69,7 +69,7 @@ class ClassificationOneD(ClassificationBase):
     super(ClassificationOneD, self).__init__(start, length)
 
   def classifyByLevelFeature(self, level, feature):
-    if not self.readPAdata(level, feature):
+    if not self.readPAdata(level):
       return {}
     refscores = {}
     for ref in self.userlvl:
@@ -102,15 +102,13 @@ class ClassificationMultiD(ClassificationBase):
   def classifyByLevelUser(self, level, user):
     self.readPAdata(level, user)
     self.level = level
-    #  return {}
     scores = self.classifyByLevelFeature(level, user)
     return scores
  
   def classifyByLevel(self, level):
-    if not self.readPAdata(level):
-      return {}
-    self.level = level
-    scores = self.classifyByLevelFeature(level)
+    scores = {}
+    for user in self.userlvl:
+      scores[user] = self.classifyByLevelUser(level, user)
     return scores
    
 class ClassificationFusion(ClassificationMultiD):
@@ -118,7 +116,6 @@ class ClassificationFusion(ClassificationMultiD):
     super(ClassificationFusion, self).__init__(start, length)
     #weights = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
     self.weights = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
-    #weights = [0.65, 0.6, 0.55, 0.5, 0.5, 0.3, 0.3, 0.2]
 
   def classifyByLevelMultiRef(self, ref):
     scores = {}

@@ -6,15 +6,15 @@ class ClassificationPDF(ClassificationOneD):
   def __init__(self, start, length):
     super(ClassificationPDF, self).__init__(start, length)
 
-  def classifyByLevelFeatureRef(self, level, feature, refuser):
+  def classifyByLevelFeatureRef(self, level, feature):
     ft = feature
-    test = self.ulftest[refuser][feature]
+    test = self.attempt[feature]
     maxv = mldata.features[ft]['end']
     minv = mldata.features[ft]['start']
     testhist = self.getHistogram(test, maxv, minv, mldata.features[ft]['step'])
     scores = dict()
-    for user in self.userlvl[level]:
-      data = self.ulf[user][feature]
+    for user in self.userlvl:
+      data = self.profiles[user][feature]
       datahist = self.getHistogram(data, maxv, minv, mldata.features[ft]['step'])
       scores[user] = self.getDistance(testhist, datahist)
     return scores
@@ -76,10 +76,10 @@ class ClassificationPDF_Multi(ClassificationMultiD, ClassificationPDF):
     for ft in mldata.enfeatures:
       ftnum.append(float(mldata.features[ft]['end'] - mldata.features[ft]['start'])/mldata.features[ft]['step'])
     self.maxasbase = max(ftnum) + 1
-    testhist = self.getHistogram(self.ulftest[ref])
+    testhist = self.getHistogram(self.attempt)
     scores = dict()
-    for user in self.userlvl[self.level]:
-      datahist = self.getHistogram(self.ulf[user])
+    for user in self.userlvl:
+      datahist = self.getHistogram(self.profiles[user])
       scores[user] = self.getDistance(testhist, datahist)
     return scores
 
