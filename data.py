@@ -76,13 +76,14 @@ def getUsers(is_profile = True):
 
 class UserData:
 #data for one user
-  def __init__(self, user, is_profile = True):
+  def __init__(self, user, level, is_profile = True):
     global dtpathp
     global dtpathl
     if is_profile:
       self.dtpath = dtpathp
     else:
       self.dtpath = dtpathl
+    self.level = level
     self.rawdata = [] #all data for one user all rows
     self.rawcount = 0
     self.rawdtlevels = {} #data for user per level
@@ -90,7 +91,7 @@ class UserData:
     self.filtered_sof = {}
     self.user = user
 
-  def getUserRawData(self):
+  def getUserRawData(self, nofilter):
     """ Get all data in the file for the user class is initialized with"""
     if self.rawdata:
       return
@@ -98,57 +99,38 @@ class UserData:
     if self.rawcount != 0:
       return True
     self.rawcount = -1
+    for ft in enfeatures:
+      self.ftlevels[ft] = []
+    datacount = {}
     for line in open(dtfile):
       if self.rawcount == -1:
         self.rawcount += 1
         continue
       self.rawcount += 1
       line = line.strip()
-      data= line.split(",")
-      self.rawdata.append([x.strip() for x in data])
+      row= [x.strip() for x in line.split(",")]
+      self.filtered_sof = 0
+      self.rawdtlevels = []
+      if self.filterData(row) or nofilter:
+        row.append(self.filtered_sof)
+        self.filtered_sof = 0
+        self.rawdtlevels.append(row) # prob here
+        for ft in enfeatures:
+          self.ftlevels[ft].append(features[ft]['func'](row))
+    datacount = len(self.ftlevels[ft])
+    return datacount
 
   def filterData(self, row):
     lev = int(getlevel(row))
     if lev in LevelsNoSuffData:
       return False
+    if lev != self.level:
+      return False
     if filterow(row): #TODO can be eliminated or used as an extra feature
-      self.filtered_sof[lev] += 1
+      self.filtered_sof += 1
       return False
     return True
 
-  def getUserRawDataLevels(self, nofilter=False):
-    """ Separate based on level """
-    #if self.rawdtlevels:
-    #  return
-    self.getUserRawData()
-    for i in levelenum:
-      self.rawdtlevels[i] = [] 
-      self.filtered_sof[i] = 0
-    for row in self.rawdata:
-      if self.filterData(row) or nofilter:
-        lev = int(getlevel(row))
-        row.append(self.filtered_sof[lev])
-        self.filtered_sof[lev] = 0
-        self.rawdtlevels[lev].append(row) # prob here
-    self.rawdata = []
-
-  def getUserFeatureLevels(self):
-    self.getUserRawDataLevels()
-    datacount = {}
-    for level in self.rawdtlevels: #initialize
-      self.ftlevels[level] = {} 
-      datacount[level] = {}
-      for ft in enfeatures:
-        self.ftlevels[level][ft] = []
-
-    #TODO remove levels 
-    for level in self.rawdtlevels:
-      for ft in enfeatures:
-        for row in self.rawdtlevels[level]:
-          # TODO filter out the results
-          self.ftlevels[level][ft].append(features[ft]['func'](row))
-      datacount[level] = len(self.ftlevels[level][ft])
-    self.rawdtlevels = dict()
-    return datacount
-    #in ftlevels, for each level, data from all features are stored for all rows
+  def getUserFeatureLevels(self, nofilter = False):
+    return self.getUserRawData(nofilter)
 

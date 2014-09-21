@@ -18,7 +18,7 @@ class ClassificationBase(object):
     udcount = {}
     mincountperL = {}
     for user in users:
-      dtuser = mldata.UserData(user)
+      dtuser = mldata.UserData(user, self.level)
       udcount[user] = dtuser.getUserFeatureLevels()
       ud[user] = dtuser.ftlevels #data from all levels and features for one user
 
@@ -26,13 +26,13 @@ class ClassificationBase(object):
     self.userlvl = []
     for user in users:
       if mldata.DEBUGL >= 2:
-        print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user][level]))
-      cntuserlvl = udcount[user][self.level]
+        print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user]))
+      cntuserlvl = udcount[user]
       if cntuserlvl <= 120:
         continue
       self.userlvl.append(user)
-      if udcount[user][self.level] < minc:
-        minc = udcount[user][self.level]
+      if udcount[user] < minc:
+        minc = udcount[user]
     mincountperL = minc
     return ud, mincountperL
 
@@ -40,7 +40,7 @@ class ClassificationBase(object):
     users = mldata.getUsers(is_profile = False)
     if user not in users:
       return False, False
-    dtuser = mldata.UserData(user, is_profile = False)
+    dtuser = mldata.UserData(user, self.level, is_profile = False)
     udcount = dtuser.getUserFeatureLevels()
     return dtuser.ftlevels,udcount
 
@@ -56,9 +56,7 @@ class ClassificationBase(object):
     #  return False
 
   def classifyByFeature(self, feature):
-    levelscores = {}
-    for level in self.profiles.ftlevels:
-      levelscores[level] = self.classifyByLevelFeature(level, feature)
+    levelscores = self.classifyByLevelFeature(level, feature)
 
   def classifyUsers(self):
     allscores = {}
@@ -102,7 +100,6 @@ class ClassificationMultiD(ClassificationBase):
     return refscores  
 
   def classifyByLevelUser(self, level, user):
-    pdb.set_trace()
     self.readPAdata(level, user)
     self.level = level
     #  return {}
@@ -128,7 +125,6 @@ class ClassificationFusion(ClassificationMultiD):
     for ft in mldata.enfeatures:
       scores[ft] = self.classifyByLevelFeatureRef(self.level, ft)
 
-    pdb.set_trace()
     finalscores = {}
     for user in self.userlvl:
       finalscores[user] = 0
