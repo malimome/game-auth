@@ -8,8 +8,8 @@ umiss = {}
 def getStats(result, udftlevel, level):
   for user in result:
     ftlevel = udftlevel[user]
-    ydiffs = np.array(ftlevel[level][2])
-    umiss[user] = sum(ftlevel[level][7])
+    ydiffs = np.array(ftlevel[2])
+    umiss[user] = sum(ftlevel[7])
     absyd =  np.absolute(ydiffs)
     uave[user] = np.mean(absyd)
     ysdev    = np.std(absyd) # stdev should compute from 0 not mean
@@ -45,7 +45,6 @@ def display_vrf(result, ud_ftlevel, level):
   usermap = ""
   rs = ""
   resultstr = ""
-  pdb.set_trace()
   for refuser in allusers:
     d = result[refuser]
     ds = sorted(d.itervalues())

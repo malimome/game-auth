@@ -28,11 +28,13 @@ class ClassificationBase(object):
       if mldata.DEBUGL >= 2:
         print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user]))
       cntuserlvl = udcount[user]
-      if cntuserlvl <= 120:
+      if cntuserlvl <= 109:
         continue
       self.userlvl.append(user)
       if udcount[user] < minc:
         minc = udcount[user]
+    if minc == 1000000:
+      minc = 0
     mincountperL = minc
     return ud, mincountperL
 
@@ -107,6 +109,10 @@ class ClassificationMultiD(ClassificationBase):
  
   def classifyByLevel(self, level):
     scores = {}
+    self.level = level
+    pdb.set_trace()
+    if not self.profiles:
+      self.profiles,self.mindtPr = self.readProfiles()
     for user in self.userlvl:
       scores[user] = self.classifyByLevelUser(level, user)
     return scores

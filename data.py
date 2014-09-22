@@ -98,7 +98,7 @@ class UserData:
     self.rawcount = -1
     for ft in enfeatures:
       self.ftlevels[ft] = []
-    datacount = {}
+    datacount = 0
     for line in open(dtfile):
       if self.rawcount == -1:
         self.rawcount += 1
@@ -107,20 +107,21 @@ class UserData:
       line = line.strip()
       row= [x.strip() for x in line.split(",")]
       self.filtered_sof = 0
-      self.rawdtlevels = []
-      if self.filterData(row) or nofilter:
+      #self.rawdtlevels = []
+      if self.filterData(row):
         row.append(self.filtered_sof)
         self.filtered_sof = 0
-        self.rawdtlevels.append(row) # prob here
+      #  self.rawdtlevels.append(row) # prob here
         for ft in enfeatures:
           self.ftlevels[ft].append(features[ft]['func'](row))
-    datacount = len(self.ftlevels[ft])
+    #pdb.set_trace()
+    datacount = len(self.ftlevels[0])
     return datacount
 
   def filterData(self, row):
     lev = int(getlevel(row))
-    if lev in LevelsNoSuffData:
-      return False
+    #if lev in LevelsNoSuffData:
+    #  return False
     if lev != self.level:
       return False
     if filterow(row): #TODO can be eliminated or used as an extra feature

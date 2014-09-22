@@ -35,7 +35,6 @@ method = options.method
 start = int(options.start)
 user = options.user
 data.enfeatures = options.features
-#pdb.set_trace()
 
 print ("__________________________________________________________________________")
 if method.strip().isdigit():
@@ -58,7 +57,7 @@ elif method == "cdf_fusion":
   else:
     refscores = ccdf.classifyByLevel(level)
     #display_result(refscores)
-    display_vrf(refscores, ccdf.ud, level)
+    display_vrf(refscores, ccdf.profiles, level)
 elif method == "pdf_fusion":
   ccdf = pdf.ClassificationPDF_Fusion(start, length)
   refscores = ccdf.classifyByLevel(level)
