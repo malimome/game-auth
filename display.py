@@ -89,6 +89,8 @@ def getMaxRes(d, allusers):
       maxd = diff
   return max_keys, maxd
 
+#d is the scores for one ref user
+#allusers is the set of all users
 def getMinRes(d, allusers):
   min_value = min(d.itervalues())
   min_keys = [allusers.index(k) for k in d if d[k] == min_value]

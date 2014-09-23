@@ -4,6 +4,7 @@ import scatter
 import data
 from display import *
 import numpy as np
+import analyse
 import pdb
 
 def split_args(option, opt, value, parser):
@@ -53,7 +54,8 @@ elif method == "cdf_fusion":
   ccdf = cdf.ClassificationCDF_Fusion(start, length)
   if user != '':
     refscores = ccdf.classifyByLevelUser(level, user)
-    print refscores
+    ana = analyse.Analyser() 
+    print ana.calcPercent(user, refscores)
   else:
     refscores = ccdf.classifyByLevel(level)
     #display_result(refscores)
