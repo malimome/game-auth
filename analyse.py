@@ -31,7 +31,7 @@ class Analyser():
     numOfUsers = len(scores)
     rank = self.analyseResultUser(refuser, scores)
     selfdist = scores[refuser]
-    percent1 = float(numOfUsers-rank*2)/numOfUsers
+    percent1 = float(numOfUsers-(rank*rank))/numOfUsers
     percent2 = 1-selfdist
     res = 0.9*percent1 + 0.1*percent2
     #res = percent1
