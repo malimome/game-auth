@@ -29,18 +29,23 @@ parser.add_option("-f", "--features", dest="features",
     default='0,1,2,3,4', action='callback', callback=split_args, type='str',
     help="List of features 0,1,2,3,4")
 parser.add_option("-u", "--user", dest="user", default='')
+parser.add_option("-d", "--debug", dest="debug", default=1)
 (options, args) = parser.parse_args()
 level = options.level
 length = int(options.length)
 method = options.method
 start = int(options.start)
 user = options.user
+debug = options.debug
 data.enfeatures = options.features
+data.DEBUG = debug
 
-print ("__________________________________________________________________________")
+if not debug:
+  print ("__________________________________________________________________________")
 if method.strip().isdigit():
   method = allmethods[int(method)]
-print("Classification method used: \t %s"%method)
+if not debug:
+  print("Classification method used: \t %s"%method)
 if method == "scatter":
   cls = scatter.Scatter_Multi(level)
   cls.display_scatter()
@@ -55,7 +60,11 @@ elif method == "cdf_fusion":
   if user != '':
     refscores = ccdf.classifyByLevelUser(level, user)
     ana = analyse.Analyser() 
-    print ana.calcPercent(user, refscores)
+    fres = ana.calcPercent(user, refscores)
+    if fres >= 0.94:
+      print "1"
+      print fres;
+      print("User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))
   else:
     refscores = ccdf.classifyByLevel(level)
     #display_result(refscores)
@@ -73,15 +82,18 @@ elif method == "cdf":
   refscores = ccdf.classifyByLevel(level)
   for ft in data.features:
     refscores[data.features[ft]['name']] = refscores.pop(ft)
-    print("---------feature %s -------------"%data.features[ft]['name'])
+    if not debug:
+      print("---------feature %s -------------"%data.features[ft]['name'])
     display_result(refscores[data.features[ft]['name']])
 elif method == "pdf":
   cb = pdf.ClassificationPDF(start, length)
   refscores = cb.classifyByLevel(level)
   for ft in data.features:
     refscores[data.features[ft]['name']] = refscores.pop(ft)
-    print("---------feature %s -------------"%data.features[ft]['name'])
+    if not debug:
+      print("---------feature %s -------------"%data.features[ft]['name'])
     display_result(refscores[data.features[ft]['name']])
-print ("__________________________________________________________________________")
+if not debug:
+  print ("__________________________________________________________________________")
 
 

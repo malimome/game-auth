@@ -50,12 +50,13 @@ class ClassificationBase(object):
     self.level = level
     if not self.profiles:
       self.profiles,self.mindtPr = self.readProfiles()
-    #if self.profiles
     if user=='':
       return True
     self.attempt, tmp = self.readAttempt(level, user)
-    #if self.attempt == False:
-    #  return False
+    if tmp < 30:
+      print "0"
+      print "0"
+      print("Not enough data for login. At least 30 rounds of game is needed but %d is provided!"%tmp)
 
   def classifyByFeature(self, feature):
     levelscores = self.classifyByLevelFeature(level, feature)
