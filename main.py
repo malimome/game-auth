@@ -20,13 +20,13 @@ allmethods = list(names)
 allmethods.extend(["cdf_fusion","pdf_fusion","pdf_multi","cdf","pdf"])
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option("-m", "--method", dest="method", default="random_forest",
+parser.add_option("-m", "--method", dest="method", default="cdf_fusion",
     help="One of %s"%str(allmethods))
 parser.add_option("-l", "--level", dest="level", default=3, type=int, help="Level of the game")
 parser.add_option("-w", "--width", dest="length", default=-30)
 parser.add_option("-b", "--begin", dest="start", default=0)
 parser.add_option("-f", "--features", dest="features", 
-    default='0,1,2,3,4', action='callback', callback=split_args, type='str',
+    default='0,1,2,3,4,5,6,7', action='callback', callback=split_args, type='str',
     help="List of features 0,1,2,3,4")
 parser.add_option("-u", "--user", dest="user", default='')
 parser.add_option("-d", "--debug", dest="debug", default=1)
@@ -65,6 +65,10 @@ elif method == "cdf_fusion":
       print "1"
       print fres;
       print("User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))
+    else:
+      print "0"
+      print fres;
+      print("User data didn't match the profile (%2.1f percent matching rate only)."%(int(fres*1000)/10.0))
   else:
     refscores = ccdf.classifyByLevel(level)
     #display_result(refscores)
