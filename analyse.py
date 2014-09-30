@@ -35,5 +35,5 @@ class Analyser():
     percent2 = 1-selfdist
     res = 0.9*percent1 + 0.1*percent2
     #res = percent1
-    return res
+    return res,rank
 
