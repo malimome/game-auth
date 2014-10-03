@@ -104,7 +104,6 @@ class ClassificationMultiD(ClassificationBase):
     return refscores  
 
   def classifyByLevelUser(self, level, user):
-    pdb.set_trace()
     cnt = self.readPAdata(level, user)
     if mldata.DEBUGL >=2:
       print("User login data length: %d"%cnt)
