@@ -60,8 +60,10 @@ elif method == "cdf_fusion":
   if user != '':
     refscores = ccdf.classifyByLevelUser(level, user)
     ana = analyse.Analyser() 
-    fres = ana.calcPercent(user, refscores)
-    if fres >= 0.94:
+    fres,rank = ana.calcPercent(user, refscores)
+    if debug == 1:
+      print("Rank= %d"%rank)
+    if fres >= 0.90:
       print "1"
       print fres;
       print("User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))

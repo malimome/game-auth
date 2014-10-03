@@ -108,6 +108,8 @@ class UserData:
       row= [x.strip() for x in line.split(",")]
       self.filtered_sof = 0
       #self.rawdtlevels = []
+      #if self.dtpath == "login/":
+        #pdb.set_trace()
       if self.filterData(row):
         row.append(self.filtered_sof)
         self.filtered_sof = 0

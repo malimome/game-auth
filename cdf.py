@@ -25,7 +25,6 @@ class ClassificationCDF(ClassificationOneD):
     return d
 
   def ks_2samp(self, data1, data2):
-  #  pdb.set_trace()
     data1, data2 = map(np.asarray, (data1, data2))
     n1 = data1.shape[0]
     n2 = data2.shape[0]
