@@ -26,7 +26,7 @@ class ClassificationBase(object):
     self.userlvl = []
     for user in users:
       if mldata.DEBUGL >= 2:
-        print ("User %s, Level %d -> Length:%d"%(user,level,udcount[user]))
+        print ("User %s, Level %d -> Length:%d"%(user,self.level,udcount[user]))
       cntuserlvl = udcount[user]
       if cntuserlvl <= 109:
         continue
@@ -52,12 +52,8 @@ class ClassificationBase(object):
       self.profiles,self.mindtPr = self.readProfiles()
     if user=='':
       return True
-    self.attempt, tmp = self.readAttempt(level, user)
-    if tmp < 30:
-      print "0"
-      print "0"
-      print("Not enough data for login. At least 30 rounds of game is needed but %d is provided!"%tmp)
-      exit(0)
+    self.attempt, cnt = self.readAttempt(level, user)
+    return cnt
 
   def classifyByFeature(self, feature):
     levelscores = self.classifyByLevelFeature(level, feature)
@@ -93,8 +89,8 @@ class ClassificationMultiD(ClassificationBase):
     super(ClassificationMultiD, self).__init__(start, length)
  
   def classifyByLevelFeature(self, level, user = ''):
-    if not self.readPAdata(level):
-      return {}
+    #if not self.readPAdata(level):
+    #  return {}
     refscores = {}
     if user != '':
       return self.classifyByLevelMultiRef(user)
@@ -104,7 +100,13 @@ class ClassificationMultiD(ClassificationBase):
     return refscores  
 
   def classifyByLevelUser(self, level, user):
-    self.readPAdata(level, user)
+    pdb.set_trace()
+    cnt = self.readPAdata(level, user)
+    if mldata.DEBUGL >=2:
+      print("User login data length: %d"%cnt)
+    if cnt < 30:
+      return {}
+
     self.level = level
     scores = self.classifyByLevelFeature(level, user)
     return scores
@@ -112,11 +114,12 @@ class ClassificationMultiD(ClassificationBase):
   def classifyByLevel(self, level):
     scores = {}
     self.level = level
-    pdb.set_trace()
     if not self.profiles:
       self.profiles,self.mindtPr = self.readProfiles()
     for user in self.userlvl:
-      scores[user] = self.classifyByLevelUser(level, user)
+      sc = self.classifyByLevelUser(level, user)
+      if len(sc):
+        scores[user] = sc
     return scores
    
 class ClassificationFusion(ClassificationMultiD):

@@ -4,6 +4,8 @@ from classifier import ClassificationOneD, ClassificationFusion
 import scipy.special as special
 import numpy as np
 import pdb
+import data
+DEBUGL = data.DEBUGL
 
 ksprob = special.kolmogorov
 class ClassificationCDF(ClassificationOneD):
@@ -22,10 +24,12 @@ class ClassificationCDF(ClassificationOneD):
     if not data or not test:
       raise ErrEmptyData
     d,pval = self.ks_2samp(data, test)
+    if DEBUGL >= 2:
+      print("Length of profile: %d, Length of login %d"%(len(data), len(test)))
+      print("Distance: %f, Prob: %f"%(d,pval))
     return d
 
   def ks_2samp(self, data1, data2):
-  #  pdb.set_trace()
     data1, data2 = map(np.asarray, (data1, data2))
     n1 = data1.shape[0]
     n2 = data2.shape[0]
