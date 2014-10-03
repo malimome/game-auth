@@ -38,7 +38,7 @@ start = int(options.start)
 user = options.user
 debug = options.debug
 data.enfeatures = options.features
-data.DEBUG = debug
+data.DEBUGL = debug
 
 if not debug:
   print ("__________________________________________________________________________")
@@ -59,6 +59,12 @@ elif method == "cdf_fusion":
   ccdf = cdf.ClassificationCDF_Fusion(start, length)
   if user != '':
     refscores = ccdf.classifyByLevelUser(level, user)
+    if not len(refscores):
+      print "0"
+      print "0"
+      print("Ooops! Not enough data for login. At least 30 rounds of game is needed!")
+      exit(0)
+
     ana = analyse.Analyser() 
     fres,rank = ana.calcPercent(user, refscores)
     if debug == 1:
@@ -66,15 +72,16 @@ elif method == "cdf_fusion":
     if fres >= 0.90:
       print "1"
       print fres;
-      print("User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))
+      print("Accept! User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))
     else:
       print "0"
       print fres;
-      print("User data didn't match the profile (%2.1f percent matching rate only)."%(int(fres*1000)/10.0))
+      print("Reject! User data didn't match the profile (%2.1f percent matching rate only)."%(int(fres*1000)/10.0))
   else:
     refscores = ccdf.classifyByLevel(level)
+    newdisplay(refscores, ccdf.profiles)
     #display_result(refscores)
-    display_vrf(refscores, ccdf.profiles, level)
+    #display_vrf(refscores, ccdf.profiles, level)
 elif method == "pdf_fusion":
   ccdf = pdf.ClassificationPDF_Fusion(start, length)
   refscores = ccdf.classifyByLevel(level)

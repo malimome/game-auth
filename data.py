@@ -62,7 +62,7 @@ def getUsers(is_profile = True):
     exit(0)
   #users = ["oldmohsen.csv1", "oldnarges.csv1", "oldhossein.csv1"]
   #users = users[0:10] #TODO
-  if DEBUGL >= 2:
+  if DEBUGL >= 2 and is_profile:
     print("Users in classification \t %s"%str(users))
     ftstr = "Features: \t\t\t "
     for ft in enfeatures:
