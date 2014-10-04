@@ -30,6 +30,7 @@ parser.add_option("-f", "--features", dest="features",
     help="List of features 0,1,2,3,4")
 parser.add_option("-u", "--user", dest="user", default='')
 parser.add_option("-d", "--debug", dest="debug", default=1)
+parser.add_option("-o", "--move", dest="move", default=1)
 (options, args) = parser.parse_args()
 level = options.level
 length = int(options.length)
@@ -39,7 +40,14 @@ user = options.user
 debug = options.debug
 data.enfeatures = options.features
 data.DEBUGL = debug
-
+# if move==0, then do not add to profile
+move = int(options.move)
+if move == 1:
+  archive = False
+  mvdest = False
+else:
+  archive = True
+  mvdest = True
 if not debug:
   print ("__________________________________________________________________________")
 if method.strip().isdigit():
@@ -67,16 +75,19 @@ elif method == "cdf_fusion":
 
     ana = analyse.Analyser() 
     fres,rank = ana.calcPercent(user, refscores)
+    usdt = data.UserData(user, level)
     if debug == 1:
       print("Rank= %d"%rank)
     if fres >= 0.90:
       print "1"
       print fres;
       print("Accept! User data matches the profile with %2.1f percent success rate."%(int(fres*1000)/10.0))
+      usdt.moveData(archive, mvdest)
     else:
       print "0"
       print fres;
       print("Reject! User data didn't match the profile (%2.1f percent matching rate only)."%(int(fres*1000)/10.0))
+      usdt.moveData(archive = True, mvdest = True)
   else:
     refscores = ccdf.classifyByLevel(level)
     newdisplay(refscores, ccdf.profiles)

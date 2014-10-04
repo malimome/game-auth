@@ -16,7 +16,6 @@ class ClassificationBase(object):
     users = mldata.getUsers()
     ud = {}
     udcount = {}
-    mincountperL = {}
     for user in users:
       dtuser = mldata.UserData(user, self.level)
       udcount[user] = dtuser.getUserFeatureLevels()
@@ -31,12 +30,15 @@ class ClassificationBase(object):
       if cntuserlvl <= 109:
         continue
       self.userlvl.append(user)
-      if udcount[user] < minc:
-        minc = udcount[user]
+      if cntuserlvl < minc:
+        minc = cntuserlvl
     if minc == 1000000:
       minc = 0
-    mincountperL = minc
-    return ud, mincountperL
+    # Only get the last portion of the profile
+    for user in self.userlvl:
+      for ft in ud[user]:
+        ud[user][ft] = ud[user][ft][-minc:]
+    return ud, minc
 
   def readAttempt(self, level, user):
     users = mldata.getUsers(is_profile = False)
@@ -58,6 +60,7 @@ class ClassificationBase(object):
       print "0"
       print("Not enough data for login. At least 30 rounds of game is needed but %d is provided!"%tmp)
       exit(0)
+    return tmp
 
   def classifyByFeature(self, feature):
     levelscores = self.classifyByLevelFeature(level, feature)

@@ -1,5 +1,6 @@
-from os import listdir
+from os import listdir, rename, remove
 from os.path import isfile, join, isdir
+import time
 import pdb
 
 #0 id, 1 rounds, 2 tot_score, 3 time, 4 ballX, 5 ballY, 6 target.X, 7 target.Y, 
@@ -133,4 +134,35 @@ class UserData:
 
   def getUserFeatureLevels(self, nofilter = False):
     return self.getUserRawData(nofilter)
+
+  def moveData(self, archive = False, mvdest = False):
+    global dtpathp, dtpathl
+    pfile = dtpathp + self.user
+    lfile = dtpathl + self.user
+    # rename the file but not add to profile
+    if archive:
+      fpath = lfile
+      # move the file to a new dir
+      if mvdest:
+        fpath = dtpathl + 'failed/' + self.user
+      tmp = str(int(time.time()))
+      try:
+        rename(lfile, fpath + tmp)
+      except Exception as e:
+        return str(e)
+      return ''
+    cnt = -1
+    with open(pfile, "a") as pf:
+      lf = open(lfile)
+      for line in lf:
+        if cnt == -1:
+          cnt += 1
+          continue
+        pf.write(line)
+    lf.close()
+    remove(lfile)
+    return ''
+
+
+
 
