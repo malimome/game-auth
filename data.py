@@ -111,12 +111,16 @@ class UserData:
       #self.rawdtlevels = []
       #if self.dtpath == "login/":
         #pdb.set_trace()
-      if self.filterData(row):
-        row.append(self.filtered_sof)
-        self.filtered_sof = 0
-      #  self.rawdtlevels.append(row) # prob here
-        for ft in enfeatures:
-          self.ftlevels[ft].append(features[ft]['func'](row))
+      try:
+        if self.filterData(row):
+          row.append(self.filtered_sof)
+          self.filtered_sof = 0
+        #  self.rawdtlevels.append(row) # prob here
+          for ft in enfeatures:
+            self.ftlevels[ft].append(features[ft]['func'](row))
+      except:
+        print "problem in row " + line + '\n';
+        continue
     #pdb.set_trace()
     datacount = len(self.ftlevels[0])
     return datacount

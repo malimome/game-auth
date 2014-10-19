@@ -76,8 +76,6 @@ elif method == "cdf_fusion":
     ana = analyse.Analyser() 
     fres,rank = ana.calcPercent(user, refscores)
     usdt = data.UserData(user, level)
-    if debug == 1:
-      print("Rank= %d"%rank)
     if fres >= 0.90:
       print "1"
       print fres;
@@ -88,6 +86,8 @@ elif method == "cdf_fusion":
       print fres;
       print("Reject! User data didn't match the profile (%2.1f percent matching rate only)."%(int(fres*1000)/10.0))
       usdt.moveData(archive = True, mvdest = True)
+    if debug == 1:
+      print("Rank= %d"%rank)
   else:
     refscores = ccdf.classifyByLevel(level)
     newdisplay(refscores, ccdf.profiles)
